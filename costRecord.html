@@ -15,35 +15,31 @@
 	
 	<div role="main" class="ui-content">
 		
-		<form class="ui-filterable">
-    		<input id="filterBasic-input" data-type="search">
+		<form>
+    		<input data-type="search" id="filterControlgroup-input">
 		</form>
-		<ul data-role="listview" data-filter="true" data-input="#filterBasic-input">
-    		<li>Acura</li>
-    		<li>Audi</li>
-    		<li>BMW</li>
-    		<li>Cadillac</li>
-    		<li>Ferrari</li>
-		</ul>
 		
 		<!--
-		<form>
-			<div class="ui-field-contain">
-  				<label>中國信託 : </label>
-  				<input type="number" data-clear-btn="true" value="" id="ct"></input>
-  			</div>
-  		
-  			<div class="ui-field-contain">
-  				<label>悠遊卡 : </label>
-  				<input type="number" data-clear-btn="true" value="" id="yoyo"></input>
-  			</div>
-  	
-  			<div class="ui-field-contain">
-  				<label>一卡通 : </label>
-  				<input type="number" data-clear-btn="true" value="" id="op"></input>
-  			</div>
-  		</form>
-  		-->
+		<ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-input="#filterControlgroup-input"></ul>
+		-->
+		
+		
+		<div id="autocomplete" data-role="controlgroup" data-filter="true" data-input="#filterControlgroup-input" data-filter-reveal="true">
+			<a href="#popupCloseLeft" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Left close button</a>
+    		<a href="#popupCloseLeft" class="ui-btn ui-shadow ui-corner-all" data-rel="popup">Button 1</a>
+    		<a href="#" class="ui-btn ui-shadow ui-corner-all">Button 2</a>
+    		<a href="#" class="ui-btn ui-shadow ui-corner-all" data-filtertext="some text">Button 3</a>
+    		<a href="#" class="ui-btn ui-shadow ui-corner-all">Button 4</a>
+    		<a href="#" class="ui-btn ui-shadow ui-corner-all">Button 5</a>
+		</div>
+	
+		
+		<div data-role="popup" id="popupCloseLeft" class="ui-content" style="max-width:280px" data-overlay-theme="a">
+    		<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-left">Close</a>
+			<p>I have a close button at the top left corner with simple HTML markup.</p>
+		</div>
+
+		
 	</div>
 	
 	<div data-role="footer"></div>
@@ -51,17 +47,48 @@
 
 <script>
 	var api_key = '51126bc7e4b0b6df02708469';
-    var api_url = 'https://api.mlab.com/api/1/databases/me/collections/account_balance?apiKey='+api_key;
+    var api_url = 'https://api.mlab.com/api/1/databases/me/collections/cost_record?apiKey='+api_key;
     
     $(document).on('pageinit','#homePage',function(event){
     	
-        //$.getJSON(api_url,function(data){
-  	    //	$.each(data,function(index,object){
-    	//    	if(object.name == 'ct') $('#ct').val(object.money);
-    	//    	if(object.name == 'yoyo') $('#yoyo').val(object.money);
-    	//    	if(object.name == 'op') $('#op').val(object.money);
-  	    //	});
-      	//});
+    	
+    	$( "#autocomplete" ).on( "filterablebeforefilter", function ( e, data ) {
+        	var $ul = $( this ),
+            $input = $( data.input ),
+            value = $input.val(),
+            html = "";
+
+			console.log('1 : '+$ul.html());
+        	$ul.html( "" );
+        	if ( value && value.length >= 1 ) {
+            	//$ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
+            	//$ul.listview( "refresh" );
+					
+					
+				$.ajaxSettings.async = false;
+				$.getJSON(api_url + '&q={"name":{ $regex: ".*'+value+'.*"}}',function(data){
+					html += '<div class="ui-controlgroup-controls ">';
+  	    			$.each(data,function(index,object){
+  	    				
+  	    				html += '<a href="#popupCloseLeft" class="ui-btn ui-shadow ui-corner-all" data-rel="popup">'+object.name+'</a>'
+  	    				console.log('2 : '+html);
+  	    			});
+  	    			html += '</div>';
+      			});
+      			$.ajaxSettings.async = true;
+      			console.log('3 : '+html);
+      			
+      			$ul.html( html );
+				$ul.controlgroup( "refresh" );
+                $ul.trigger( "updatelayout");
+
+            	
+        	}
+    	});
+    	
+    	
+    	
+       
 	});
 
 	//$(document).on('change',':input',function(){ 
@@ -79,3 +106,26 @@
 
 </body>
 </html>
+
+
+<!--
+
+$.ajax({
+                	url: "http://gd.geobytes.com/AutoCompleteCity",
+                	dataType: "jsonp",
+                	crossDomain: true,
+                	data: {
+                    	q: $input.val()
+                	}
+            	})
+            	.then( function ( response ) {
+                	$.each( response, function ( i, val ) {
+                    	html += "<li>" + val + "</li>";
+                	});
+                	$ul.html( html );
+                	$ul.listview( "refresh" );
+                	$ul.trigger( "updatelayout");
+            	});
+
+
+-->
