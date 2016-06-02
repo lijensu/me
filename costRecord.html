@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>開銷紀錄</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+  <div data-role="page" id="homePage">
+	<div data-role="header">開銷紀錄</div>
+	
+	<div role="main" class="ui-content">
+		
+		<form class="ui-filterable">
+    		<input id="filterBasic-input" data-type="search">
+		</form>
+		<ul data-role="listview" data-filter="true" data-input="#filterBasic-input">
+    		<li>Acura</li>
+    		<li>Audi</li>
+    		<li>BMW</li>
+    		<li>Cadillac</li>
+    		<li>Ferrari</li>
+		</ul>
+		
+		<!--
+		<form>
+			<div class="ui-field-contain">
+  				<label>中國信託 : </label>
+  				<input type="number" data-clear-btn="true" value="" id="ct"></input>
+  			</div>
+  		
+  			<div class="ui-field-contain">
+  				<label>悠遊卡 : </label>
+  				<input type="number" data-clear-btn="true" value="" id="yoyo"></input>
+  			</div>
+  	
+  			<div class="ui-field-contain">
+  				<label>一卡通 : </label>
+  				<input type="number" data-clear-btn="true" value="" id="op"></input>
+  			</div>
+  		</form>
+  		-->
+	</div>
+	
+	<div data-role="footer"></div>
+  </div>
+
+<script>
+	var api_key = '51126bc7e4b0b6df02708469';
+    var api_url = 'https://api.mlab.com/api/1/databases/me/collections/account_balance?apiKey='+api_key;
+    
+    $(document).on('pageinit','#homePage',function(event){
+    	
+        //$.getJSON(api_url,function(data){
+  	    //	$.each(data,function(index,object){
+    	//    	if(object.name == 'ct') $('#ct').val(object.money);
+    	//    	if(object.name == 'yoyo') $('#yoyo').val(object.money);
+    	//    	if(object.name == 'op') $('#op').val(object.money);
+  	    //	});
+      	//});
+	});
+
+	//$(document).on('change',':input',function(){ 
+	//    id = $(this).attr('id');
+    //	money_new = $(this).val();
+    //	$.ajax({ 
+    //		url : api_url + '&q={"name":"'+id+'"}',
+	//		data : JSON.stringify({ "$set" : { "money" : money_new } }),
+	//	  	type : "PUT",
+	//	  	contentType : "application/json" } 
+	//	);
+	//});
+
+</script>
+
+</body>
+</html>
