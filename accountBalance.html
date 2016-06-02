@@ -9,78 +9,60 @@
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
-
-
-
 <body>
   <div data-role="page" id="homePage">
-	<div data-role="header">頁首V3</div>
-	
+	<div data-role="header">Header</div>
 	
 	<div role="main" class="ui-content">
 		<form>
-		<div class="ui-field-contain">
-  			<label for="text-1">中國信託 : </label>
-  			<input type="text" name="text-1" id="textCT" data-clear-btn="true" value=""></input>
-  		</div>
+			<div class="ui-field-contain">
+  				<label>中國信託 : </label>
+  				<input type="number" data-clear-btn="true" value="" id="ct"></input>
+  			</div>
   		
-  		<label>悠遊卡 : </label>
-  		<input type="number" data-clear-btn="true" value="" id="textYoyo"></input>
+  			<div class="ui-field-contain">
+  				<label>悠遊卡 : </label>
+  				<input type="number" data-clear-btn="true" value="" id="yoyo"></input>
+  			</div>
   	
-  		<label>一卡通 : </label>
-  		<input data-clear-btn="true" value="" id="textOp"></input>
+  			<div class="ui-field-contain">
+  				<label>一卡通 : </label>
+  				<input type="number" data-clear-btn="true" value="" id="op"></input>
+  			</div>
   		</form>
-  		
-
-		
 	</div>
 	
-	
-	
-	
-	<div data-role="footer">頁尾</div>
-	
-	
-	
+	<div data-role="footer">Footer</div>
   </div>
-  
-  
-  
+
 <script>
+	var api_key = '51126bc7e4b0b6df02708469';
+    var api_url = 'https://api.mlab.com/api/1/databases/me/collections/account_balance?apiKey='+api_key;
+    
+    $(document).on('pageinit','#homePage',function(event){
+        $.getJSON(api_url,function(data){
+  	    	$.each(data,function(index,object){
+    	    	if(object.name == 'ct') $('#ct').val(object.money);
+    	    	if(object.name == 'yoyo') $('#yoyo').val(object.money);
+    	    	if(object.name == 'op') $('#op').val(object.money);
+  	    	});
+      	});
+	});
 
-$( document ).on( "pageinit", "#homePage", function( event ) {
-  var api_key = "51126bc7e4b0b6df02708469";
-  var url = "https://api.mlab.com/api/1/databases/me/collections/account_balance?apiKey="+api_key;
-  $.getJSON( url, function( data ) {
-  	var items = [];
-  	$.each( data, function( index, object ) {
-    	if(object.name == 'ct') $('#textCT').val(object.money);
-    	if(object.name == 'yoyo') $('#textYoyo').val(object.money);
-    	if(object.name == 'op') $('#textOp').val(object.money);
-  	});
-  });
-  
-  $('#textYoyo').change({
-   //alert('change!');
-   
-  });
-
-  
-  
-});
-
-$(document).on('change','#textYoyo',function(){ 
-    alert("Changed!"); 
-});
+	$(document).on('change',':input',function(){ 
+	    id = $(this).attr('id');
+	    console.log(id);
+	    
+    	money_new = $(this).val();
+    	$.ajax({ 
+    		url : api_url + '&q={"name":"'+id+'"}',
+			data : JSON.stringify({ "$set" : { "money" : money_new } }),
+		  	type : "PUT",
+		  	contentType : "application/json" } 
+		);
+	});
 
 </script>
 
-
 </body>
 </html>
-	
-
-
-
-
-
