@@ -11,7 +11,7 @@
 </head>
 <body>
   <div data-role="page" id="homePage">
-	<div data-role="header">Header</div>
+	<div data-role="header">帳戶餘額(V1)</div>
 	
 	<div role="main" class="ui-content">
 		<form>
@@ -32,7 +32,7 @@
   		</form>
 	</div>
 	
-	<div data-role="footer">Footer</div>
+	<div data-role="footer"></div>
   </div>
 
 <script>
@@ -51,8 +51,6 @@
 
 	$(document).on('change',':input',function(){ 
 	    id = $(this).attr('id');
-	    console.log(id);
-	    
     	money_new = $(this).val();
     	$.ajax({ 
     		url : api_url + '&q={"name":"'+id+'"}',
