@@ -6,25 +6,33 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
 
+
+
 <body>
-  <div data-role="page">
+  <div data-role="page" id="homePage">
 	<div data-role="header">頁首V2</div>
 	
 	
 	<div role="main" class="ui-content">
+		<form>
 		<div class="ui-field-contain">
-  			<label for="text-1">中國信託 : </label>
-  			<input type="text" name="text-1" id="text-1" data-clear-btn="true" value=""></input>
-	
-			<label>悠遊卡 : </label>
-  			<input data-clear-btn="true" value=""></input>
-  	
-  			<label>一卡通 : </label>
-  			<input data-clear-btn="true" value=""></input>
-  
+  			<label for="text-1" style="width:80px">中國信託 : </label>
+  			<input type="text" name="text-1" id="textCT" data-clear-btn="true" value="" style="width:80px"></input>
   		</div>
+  		
+  		<label>悠遊卡 : </label>
+  		<input data-clear-btn="true" value="" id="textYoyo"></input>
+  	
+  		<label>一卡通 : </label>
+  		<input data-clear-btn="true" value="" id="textOp"></input>
+  		</form>
+  		
+
+		
 	</div>
 	
 	
@@ -39,15 +47,22 @@
   
   
 <script>
-$(document).ready(function() {
-
+$( document ).on( "pageinit", "#homePage", function( event ) {
+  var api_key = "51126bc7e4b0b6df02708469";
+  var url = "https://api.mlab.com/api/1/databases/me/collections/account_balance?apiKey="+api_key;
+  $.getJSON( url, function( data ) {
+  	var items = [];
+  	$.each( data, function( index, object ) {
+    	if(object.name == 'ct') $('#textCT').val(object.money);
+    	if(object.name == 'yoyo') $('#textYoyo').val(object.money);
+    	if(object.name == 'op') $('#textOp').val(object.money);
+  	});
+  });
 });
 </script>
+
+
 </body>
-
-
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </html>
 	
 
