@@ -20,12 +20,12 @@
 	<div role="main" class="ui-content">
 		<form>
 		<div class="ui-field-contain">
-  			<label for="text-1" style="width:80px">中國信託 : </label>
-  			<input type="text" name="text-1" id="textCT" data-clear-btn="true" value="" style="width:80px"></input>
+  			<label for="text-1">中國信託 : </label>
+  			<input type="text" name="text-1" id="textCT" data-clear-btn="true" value=""></input>
   		</div>
   		
   		<label>悠遊卡 : </label>
-  		<input data-clear-btn="true" value="" id="textYoyo"></input>
+  		<input type="number" data-clear-btn="true" value="" id="textYoyo"></input>
   	
   		<label>一卡通 : </label>
   		<input data-clear-btn="true" value="" id="textOp"></input>
@@ -47,6 +47,7 @@
   
   
 <script>
+
 $( document ).on( "pageinit", "#homePage", function( event ) {
   var api_key = "51126bc7e4b0b6df02708469";
   var url = "https://api.mlab.com/api/1/databases/me/collections/account_balance?apiKey="+api_key;
@@ -58,7 +59,20 @@ $( document ).on( "pageinit", "#homePage", function( event ) {
     	if(object.name == 'op') $('#textOp').val(object.money);
   	});
   });
+  
+  $('#textYoyo').change({
+   //alert('change!');
+   
+  });
+
+  
+  
 });
+
+$(document).on('change','#textYoyo',function(){ 
+    alert("Changed!"); 
+});
+
 </script>
 
 
