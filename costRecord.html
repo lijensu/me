@@ -8,6 +8,12 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	
+	<style type="text/css">
+  	.ui-btn {
+    	text-align: left;
+    }
+  </style>
 </head>
 <body>
   <div data-role="page" id="homePage">
@@ -37,6 +43,10 @@
 		<div data-role="popup" id="popupCloseLeft" class="ui-content" style="max-width:280px" data-overlay-theme="a">
     		<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-left">Close</a>
 			<p>I have a close button at the top left corner with simple HTML markup.</p>
+			<p>品名 : </p>
+			<p>價錢 : </p>
+			<p>地點 : </p>
+			<p>時間 : </p>
 		</div>
 
 		
@@ -69,8 +79,9 @@
 				$.getJSON(api_url + '&q={"name":{ $regex: ".*'+value+'.*"}}',function(data){
 					html += '<div class="ui-controlgroup-controls ">';
   	    			$.each(data,function(index,object){
+  	    				var oid = object._id.$oid;
   	    				
-  	    				html += '<a href="#popupCloseLeft" class="ui-btn ui-shadow ui-corner-all" data-rel="popup">'+object.name+'</a>'
+  	    				html += '<a href="#popupCloseLeft" class="ui-btn ui-shadow ui-corner-all popBtn" data-rel="popup" oid="'+oid+'">'+object.name+'</a>'
   	    				console.log('2 : '+html);
   	    			});
   	    			html += '</div>';
@@ -88,6 +99,64 @@
     	
     	
     	
+    	$(document).on("vclick", ".popBtn", function() {
+    		console.log('pop btn click!');
+    		
+    		var popBtn = $(this);
+    		var oid = $(this).attr('oid');
+    		
+    		console.log('oid='+oid);
+    		
+    		var backHtml = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-left">Close</a>'
+    		
+    		$.ajaxSettings.async = false;
+				$.getJSON(api_url + '&q={"_id":{"$oid":"'+oid+'"}}',function(data){
+					var object = data[0];
+					
+					$('#popupCloseLeft').html('');
+					var html = '';
+					html += backHtml;   
+					html += '<p>品名 : '+object.name+'</p>';
+					html += '<p>價錢 : '+object.price+'</p>';
+					html += '<p>地點 : '+object.location+'</p>';
+					html += '<p>時間 : '+object.date+'</p>';
+				
+					$('#popupCloseLeft').html(html);
+					
+					console.dir(data);
+					//html += '<div class="ui-controlgroup-controls ">';
+  	    			//$.each(data,function(index,object){
+  	    			//	var oid = object._id.$oid;
+  	    			//	
+  	    			//	html += '<a href="#popupCloseLeft" class="ui-btn ui-shadow ui-corner-all popBtn" data-rel="popup" oid="'+oid+'">'+object.name+'</a>'
+  	    			//	console.log('2 : '+html);
+  	    			//});
+  	    			//html += '</div>';
+      			});
+      		$.ajaxSettings.async = true;
+      		
+      		
+		});
+		
+    	$( ".popBtn" ).on( "vclick", function() {
+        	//var target = $( this ),
+            //brand = target.find( "h2" ).html(),
+            //model = target.find( "p" ).html(),
+            //short = target.attr( "id" ),
+            //closebtn = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>',
+            //header = '<div data-role="header"><h2>' + brand + ' ' + model + '</h2></div>',
+            //img = '<img src="../_assets/img/' + short + '.jpg" alt="' + brand + '" class="photo">',
+            //popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short +'" data-theme="none" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
+        	// Create the popup.
+        	//$( header )
+            //	.appendTo( $( popup )
+            //    .appendTo( $.mobile.activePage )
+            //    .popup() )
+            //	.toolbar()
+            //	.before( closebtn )
+            //	.after( img );
+        	
+    	});
        
 	});
 
@@ -103,6 +172,7 @@
 	//});
 
 </script>
+
 
 </body>
 </html>
