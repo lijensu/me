@@ -11,45 +11,28 @@
 	
 	<style type="text/css">
   	.ui-btn {
-    	text-align: left;
+    	text-align: left;/* 按鈕統一靠左 */
     }
   </style>
 </head>
 <body>
   <div data-role="page" id="homePage">
-	<div data-role="header">開銷紀錄(V1)</div>
+	<div data-role="header">開銷紀錄</div>
 	
 	<div role="main" class="ui-content">
 		
 		<form>
-    		<input data-type="search" id="filterControlgroup-input">
+    		<input data-type="search" id="inputSearch">
 		</form>
-		
-		<!--
-		<ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-input="#filterControlgroup-input"></ul>
-		-->
-		
-		
-		<div id="autocomplete" data-role="controlgroup" data-filter="true" data-input="#filterControlgroup-input" data-filter-reveal="true">
-			<a href="#popupCloseLeft" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Left close button</a>
-    		<a href="#popupCloseLeft" class="ui-btn ui-shadow ui-corner-all" data-rel="popup">Button 1</a>
-    		<a href="#" class="ui-btn ui-shadow ui-corner-all">Button 2</a>
-    		<a href="#" class="ui-btn ui-shadow ui-corner-all" data-filtertext="some text">Button 3</a>
-    		<a href="#" class="ui-btn ui-shadow ui-corner-all">Button 4</a>
-    		<a href="#" class="ui-btn ui-shadow ui-corner-all">Button 5</a>
+
+		<div id="divResutl" data-role="controlgroup" data-filter="true" data-input="#inputSearch" data-filter-reveal="false">
+	
 		</div>
 	
-		
-		<div data-role="popup" id="popupCloseLeft" class="ui-content" style="max-width:280px" data-overlay-theme="a">
-    		<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-left">Close</a>
-			<p>I have a close button at the top left corner with simple HTML markup.</p>
-			<p>品名 : </p>
-			<p>價錢 : </p>
-			<p>地點 : </p>
-			<p>時間 : </p>
+		<div data-role="popup" id="popupForm" class="ui-content" style="max-width:280px" data-overlay-theme="a">
+    		
 		</div>
 
-		
 	</div>
 	
 	<div data-role="footer"></div>
@@ -58,144 +41,66 @@
 <script>
 	var api_key = '51126bc7e4b0b6df02708469';
     var api_url = 'https://api.mlab.com/api/1/databases/me/collections/cost_record?apiKey='+api_key;
+    var searchResult; //查詢後的資料存放區
     
     $(document).on('pageinit','#homePage',function(event){
-    	
-    	
-    	$( "#autocomplete" ).on( "filterablebeforefilter", function ( e, data ) {
-        	var $ul = $( this ),
-            $input = $( data.input ),
-            value = $input.val(),
-            html = "";
-
-			console.log('1 : '+$ul.html());
-        	$ul.html( "" );
-        	if ( value && value.length >= 1 ) {
-            	//$ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
-            	//$ul.listview( "refresh" );
-					
-					
+    	// 執行查詢動作
+    	$('#divResutl').on('filterablebeforefilter',function(e,data){
+        	var $ul = $(this);
+            var value = $(data.input).val();
+            var html = '';
+			$ul.html('');
+        	if (value && value.length >= 1) {			
 				$.ajaxSettings.async = false;
 				$.getJSON(api_url + '&q={"name":{ $regex: ".*'+value+'.*"}}',function(data){
+					searchResult = data;
 					html += '<div class="ui-controlgroup-controls ">';
   	    			$.each(data,function(index,object){
-  	    				var oid = object._id.$oid;
-  	    				
-  	    				html += '<a href="#popupCloseLeft" class="ui-btn ui-shadow ui-corner-all popBtn" data-rel="popup" oid="'+oid+'">'+object.name+'</a>'
-  	    				console.log('2 : '+html);
+  	    				var oid = object._id.$oid;  	
+  	    				html += '<a href="#popupForm" class="ui-btn ui-shadow ui-corner-all popBtn" data-rel="popup" oid="'+oid+'">'+object.name+'</a>'
   	    			});
   	    			html += '</div>';
       			});
       			$.ajaxSettings.async = true;
-      			console.log('3 : '+html);
-      			
-      			$ul.html( html );
-				$ul.controlgroup( "refresh" );
-                $ul.trigger( "updatelayout");
 
-            	
+      			$ul.html(html).controlgroup('refresh').trigger('updatelayout');
         	}
     	});
-    	
-    	
-    	
-    	$(document).on("vclick", ".popBtn", function() {
-    		console.log('pop btn click!');
-    		
+    	// 取得資料(by id)
+    	function getObjectById(oid){
+    		var result;
+    
+    		$.each(searchResult,function(index,object){
+  	    		if(object._id.$oid == oid){
+  	    			result = object;
+  	    			return false;
+  	    		}
+  	    	});
+  	    	
+  	    	return result;
+    	}
+    	// 點擊按鈕執行
+    	$(document).on('vclick', '.popBtn', function() {
     		var popBtn = $(this);
     		var oid = $(this).attr('oid');
-    		
-    		console.log('oid='+oid);
-    		
     		var backHtml = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-left">Close</a>'
     		
-    		$.ajaxSettings.async = false;
-				$.getJSON(api_url + '&q={"_id":{"$oid":"'+oid+'"}}',function(data){
-					var object = data[0];
-					
-					$('#popupCloseLeft').html('');
-					var html = '';
-					html += backHtml;   
-					html += '<p>品名 : '+object.name+'</p>';
-					html += '<p>價錢 : '+object.price+'</p>';
-					html += '<p>地點 : '+object.location+'</p>';
-					html += '<p>時間 : '+object.date+'</p>';
+    		var object = getObjectById(oid);
+    		
+			$('#popupForm').html('');
+			var html = '';
+			html += backHtml;   
+			html += '<p>品名 : '+object.name+'</p>';
+			html += '<p>價錢 : '+object.price+'</p>';
+			html += '<p>地點 : '+object.location+'</p>';
+			html += '<p>時間 : '+object.date+'</p>';
 				
-					$('#popupCloseLeft').html(html);
-					
-					console.dir(data);
-					//html += '<div class="ui-controlgroup-controls ">';
-  	    			//$.each(data,function(index,object){
-  	    			//	var oid = object._id.$oid;
-  	    			//	
-  	    			//	html += '<a href="#popupCloseLeft" class="ui-btn ui-shadow ui-corner-all popBtn" data-rel="popup" oid="'+oid+'">'+object.name+'</a>'
-  	    			//	console.log('2 : '+html);
-  	    			//});
-  	    			//html += '</div>';
-      			});
-      		$.ajaxSettings.async = true;
-      		
-      		
+			$('#popupForm').html(html);
+      			
 		});
-		
-    	$( ".popBtn" ).on( "vclick", function() {
-        	//var target = $( this ),
-            //brand = target.find( "h2" ).html(),
-            //model = target.find( "p" ).html(),
-            //short = target.attr( "id" ),
-            //closebtn = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>',
-            //header = '<div data-role="header"><h2>' + brand + ' ' + model + '</h2></div>',
-            //img = '<img src="../_assets/img/' + short + '.jpg" alt="' + brand + '" class="photo">',
-            //popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short +'" data-theme="none" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
-        	// Create the popup.
-        	//$( header )
-            //	.appendTo( $( popup )
-            //    .appendTo( $.mobile.activePage )
-            //    .popup() )
-            //	.toolbar()
-            //	.before( closebtn )
-            //	.after( img );
-        	
-    	});
-       
 	});
-
-	//$(document).on('change',':input',function(){ 
-	//    id = $(this).attr('id');
-    //	money_new = $(this).val();
-    //	$.ajax({ 
-    //		url : api_url + '&q={"name":"'+id+'"}',
-	//		data : JSON.stringify({ "$set" : { "money" : money_new } }),
-	//	  	type : "PUT",
-	//	  	contentType : "application/json" } 
-	//	);
-	//});
-
 </script>
 
 
 </body>
 </html>
-
-
-<!--
-
-$.ajax({
-                	url: "http://gd.geobytes.com/AutoCompleteCity",
-                	dataType: "jsonp",
-                	crossDomain: true,
-                	data: {
-                    	q: $input.val()
-                	}
-            	})
-            	.then( function ( response ) {
-                	$.each( response, function ( i, val ) {
-                    	html += "<li>" + val + "</li>";
-                	});
-                	$ul.html( html );
-                	$ul.listview( "refresh" );
-                	$ul.trigger( "updatelayout");
-            	});
-
-
--->
